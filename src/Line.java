@@ -11,7 +11,7 @@ class Line {
     private ArrayList<Point> points = new ArrayList<>();
 
 
-    public Line(Point start, Point end) throws IOException {
+    public Line(Point start, Point end) {
         this.start = start;
         this.end = end;
 
@@ -313,7 +313,11 @@ class Line {
     }
 
     private double distance(Node n) {
-        return 0;
+        return Math.sqrt(squared(end.x - n.getLocation().x) + squared(end.y - n.getLocation().y));
+    }
+
+    private double squared(double x) {
+        return x * x;
     }
 
     private int getConflicts() {

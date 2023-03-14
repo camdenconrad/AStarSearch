@@ -86,14 +86,10 @@ public class Main {
 
                                     graphics.update();
                                     Line line;
-                                    try {
-                                        start = new Point((int) ((start.getX()) / 65), (int) (((start.getY()) - 32) / 65));
-                                        end = new Point((int) ((end.getX()) / 65), (int) (((end.getY()) - 32) / 65));
+                                    start = new Point((int) ((start.getX()) / 65), (int) (((start.getY()) - 32) / 65));
+                                    end = new Point((int) ((end.getX()) / 65), (int) (((end.getY()) - 32) / 65));
 
-                                        line = new Line(start, end);
-                                    } catch (IOException ex) {
-                                        throw new RuntimeException(ex);
-                                    }
+                                    line = new Line(start, end);
 
                                     graphics.drawLine(line);
                                     graphics.update();
