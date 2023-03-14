@@ -14,6 +14,16 @@ public class Node {
     private Node right = null;
     private Node top = null;
     private Node bottom = null;
+    private Node topLeft = null;
+    private Node topRight = null;
+    private Node bottomLeft = null;
+    private Node bottomRight = null;
+
+    public Node(BufferedImage image, Point location) {
+        this.image = image;
+        this.location = location;
+
+    }
 
     public Node getTopLeft() {
         return topLeft;
@@ -29,17 +39,6 @@ public class Node {
 
     public Node getBottomRight() {
         return bottomRight;
-    }
-
-    private Node topLeft = null;
-    private Node topRight = null;
-    private Node bottomLeft = null;
-    private Node bottomRight = null;
-
-    public Node(BufferedImage image, Point location) {
-        this.image = image;
-        this.location = location;
-
     }
 
     public void findNeighbors() {

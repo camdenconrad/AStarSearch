@@ -55,22 +55,25 @@ class Line {
 
 
         for (Node n : start.getNeighbors()) {
-            if (n.getLocation().equals(end.getLocation())) {
-                generatePoints(new Point(48 + (s.getLocation().x * 65), 48 + (s.getLocation().y * 65)), new Point(48 + (e.x * 65), 48 + (e.y * 65)));
-                return;
-            } else {
-                if (!n.isBlocked() && !n.isVisited() && notLocalBlocked(start, n)) {
-                    if (best == null) {
-                        best = n;
-                    } else {
-                        if (manhattanDistance(best) > manhattanDistance(n)) {
+            if(notLocalBlocked(start, n)) {
+                if (n.getLocation().equals(end.getLocation())) {
+                    generatePoints(new Point(48 + (s.getLocation().x * 65), 48 + (s.getLocation().y * 65)), new Point(48 + (e.x * 65), 48 + (e.y * 65)));
+                    return;
+                } else {
+                    if (!n.isBlocked() && !n.isVisited()) {
+                        if (best == null) {
                             best = n;
+                        } else {
+                            if (manhattanDistance(best) > manhattanDistance(n)) {
+                                best = n;
+                            }
                         }
+
                     }
-                    n.setVisited(true);
 
                 }
             }
+            n.setVisited(true);
 
         }
         if (best != null) {
@@ -83,34 +86,44 @@ class Line {
     }
 
     private boolean notLocalBlocked(Node start, Node n) {
+        try {
         if (start.getTopLeft().getLocation().equals(n.getLocation())) {
-            try {
                 if(n.getLeft().isBlocked() && n.getTop().isBlocked()) {
+                    System.out.println("X");
                     return false;
                 }
-            } catch (NullPointerException ignored){}
         }
+        } catch (NullPointerException ignored){}
+        try {
         if (start.getTopRight().getLocation().equals(n.getLocation())) {
-            try {
+
                 if(n.getRight().isBlocked() && n.getTop().isBlocked()) {
+                    System.out.println("X");
                     return false;
                 }
-            } catch (NullPointerException ignored){}
+            }
         }
+        catch (NullPointerException ignored){}
+        try {
         if (start.getBottomRight().getLocation().equals(n.getLocation())) {
-            try {
+
                 if(n.getLeft().isBlocked() && n.getBottom().isBlocked()) {
+                    System.out.println("X");
                     return false;
                 }
-            } catch (NullPointerException ignored){}
+            }
         }
-        if (start.getBottomRight().getLocation().equals(n.getLocation())) {
-            try {
+        catch (NullPointerException ignored){}
+        try {
+        if (start.getBottomLeft().getLocation().equals(n.getLocation())) {
+
                 if(n.getRight().isBlocked() && n.getBottom().isBlocked()) {
+                    System.out.println("X");
                     return false;
                 }
-            } catch (NullPointerException ignored){}
+            }
         }
+        catch (NullPointerException ignored){}
 
         return true;
     }
