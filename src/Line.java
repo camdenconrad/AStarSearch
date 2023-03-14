@@ -59,8 +59,7 @@ class Line {
                 generatePoints(new Point(48 + (s.getLocation().x * 65), 48 + (s.getLocation().y * 65)), new Point(48 + (e.x * 65), 48 + (e.y * 65)));
                 return;
             } else {
-                // && !notLocalBlocked(start, n)
-                if (!n.isBlocked() && !n.isVisited()) {
+                if (!n.isBlocked() && !n.isVisited() && notLocalBlocked(start, n)) {
                     if (best == null) {
                         best = n;
                     } else {
@@ -83,8 +82,38 @@ class Line {
         }
     }
 
-//    private boolean notLocalBlocked(Node start, Node n) {
-//    }
+    private boolean notLocalBlocked(Node start, Node n) {
+        if (start.getTopLeft().getLocation().equals(n.getLocation())) {
+            try {
+                if(n.getLeft().isBlocked() && n.getTop().isBlocked()) {
+                    return false;
+                }
+            } catch (NullPointerException ignored){}
+        }
+        if (start.getTopRight().getLocation().equals(n.getLocation())) {
+            try {
+                if(n.getRight().isBlocked() && n.getTop().isBlocked()) {
+                    return false;
+                }
+            } catch (NullPointerException ignored){}
+        }
+        if (start.getBottomRight().getLocation().equals(n.getLocation())) {
+            try {
+                if(n.getLeft().isBlocked() && n.getBottom().isBlocked()) {
+                    return false;
+                }
+            } catch (NullPointerException ignored){}
+        }
+        if (start.getBottomRight().getLocation().equals(n.getLocation())) {
+            try {
+                if(n.getRight().isBlocked() && n.getBottom().isBlocked()) {
+                    return false;
+                }
+            } catch (NullPointerException ignored){}
+        }
+
+        return true;
+    }
 
     private void generateNodeBased() {
         // reset points to be node based

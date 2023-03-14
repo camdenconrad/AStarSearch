@@ -14,6 +14,23 @@ public class Node {
     private Node right = null;
     private Node top = null;
     private Node bottom = null;
+
+    public Node getTopLeft() {
+        return topLeft;
+    }
+
+    public Node getTopRight() {
+        return topRight;
+    }
+
+    public Node getBottomLeft() {
+        return bottomLeft;
+    }
+
+    public Node getBottomRight() {
+        return bottomRight;
+    }
+
     private Node topLeft = null;
     private Node topRight = null;
     private Node bottomLeft = null;
@@ -49,18 +66,23 @@ public class Node {
         }
         try {
             neighbors.add(World.getNodes()[location.x - 1][location.y - 1]);
+            bottomLeft = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
             neighbors.add(World.getNodes()[location.x + 1][location.y - 1]);
+            bottomRight = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
             neighbors.add(World.getNodes()[location.x - 1][location.y + 1]);
+
+            topLeft = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
             neighbors.add(World.getNodes()[location.x + 1][location.y + 1]);
+            topRight = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
 
