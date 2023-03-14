@@ -1,60 +1,73 @@
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.ArrayList;
+import java.util.Objects;
 
 public class Node {
 
     private final BufferedImage image;
+    private final ArrayList<Node> neighbors = new ArrayList<>();
     private Point location;
     private boolean isVisited;
-    private final Node[] neighbors = new Node[8];
     private boolean blocked = false;
     private Node left = null;
     private Node right = null;
     private Node top = null;
     private Node bottom = null;
+    private Node topLeft = null;
+    private Node topRight = null;
+    private Node bottomLeft = null;
+    private Node bottomRight = null;
 
     public Node(BufferedImage image, Point location) {
         this.image = image;
         this.location = location;
 
-
     }
 
-    public Node[] getNeighbors() {
+    public void findNeighbors() {
+
         try {
-            neighbors[0] = World.getNodes()[location.x + 1][location.y];
+            neighbors.add(World.getNodes()[location.x + 1][location.y]);
+            right = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
-            neighbors[1] = World.getNodes()[location.x - 1][location.y];
+            neighbors.add(World.getNodes()[location.x - 1][location.y]);
+            left = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
-            neighbors[2] = World.getNodes()[location.x][location.y + 1];
+            neighbors.add(World.getNodes()[location.x][location.y + 1]);
+            top = neighbors.get(neighbors.size() - 1);
         } catch (IndexOutOfBoundsException ignored) {
         }
         try {
-            neighbors[3] = World.getNodes()[location.x][location.y - 1];
+            neighbors.add(World.getNodes()[location.x][location.y - 1]);
+            bottom = neighbors.get(neighbors.size() - 1);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
+        try {
+            neighbors.add(World.getNodes()[location.x - 1][location.y - 1]);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
+        try {
+            neighbors.add(World.getNodes()[location.x + 1][location.y - 1]);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
+        try {
+            neighbors.add(World.getNodes()[location.x - 1][location.y + 1]);
+        } catch (IndexOutOfBoundsException ignored) {
+        }
+        try {
+            neighbors.add(World.getNodes()[location.x + 1][location.y + 1]);
         } catch (IndexOutOfBoundsException ignored) {
         }
 
-        try {
-            neighbors[4] = World.getNodes()[location.x - 1][location.y - 1];
-        } catch (IndexOutOfBoundsException ignored) {
-        }
-        try {
-            neighbors[5] = World.getNodes()[location.x + 1][location.y - 1];
-        } catch (IndexOutOfBoundsException ignored) {
-        }
-        try {
-            neighbors[6] = World.getNodes()[location.x - 1][location.y + 1];
-        } catch (IndexOutOfBoundsException ignored) {
-        }
-        try {
-            neighbors[7] = World.getNodes()[location.x + 1][location.y + 1];
-        } catch (IndexOutOfBoundsException ignored) {
-        }
+        neighbors.removeIf(Objects::isNull);
+    }
 
+    public ArrayList<Node> getNeighbors() {
 
         return neighbors;
     }

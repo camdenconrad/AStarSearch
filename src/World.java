@@ -55,6 +55,7 @@ public class World {
                 }
             } catch (IndexOutOfBoundsException | NullPointerException ignored) {
             }
+
         }
 
 
@@ -78,6 +79,14 @@ public class World {
 
     public static Node[][] getNodes() {
         return nodes;
+    }
+
+    public static void setup() {
+        for (Node[] nArr : nodes) {
+            for (Node n : nArr) {
+                n.findNeighbors();
+            }
+        }
     }
 
     public static Node findNode(Point location) {
@@ -106,6 +115,10 @@ public class World {
         }
 
         return true;
+    }
+
+    public static boolean blocked(Node n) {
+        return !notBlocked(n.getLocation());
     }
 
     public Point[] getBlocked() {

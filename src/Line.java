@@ -4,6 +4,8 @@ import java.util.ArrayList;
 
 class Line {
     private final ArrayList<Line> components = new ArrayList<>();
+    private final ArrayList<Node> blockedNodes = new ArrayList<>();
+    ArrayList<Node> nodes;
     private Point start;
     private Point end;
     private ArrayList<Point> points = new ArrayList<>();
@@ -13,22 +15,98 @@ class Line {
         this.start = start;
         this.end = end;
 
-        generatePoints(start, end);
+        pathGen(start, end);
 
-        this.getNodes(0);
+        //generatePoints(start, end);
+//
+//        nodes = rayCast();
+//
+//        generateNodeBased();
+
+//        this.split(this, 0);
+
+        //nodes = rayCast();
+        //generateNodeBased();
     }
 
-    public Line(Point start, Point end, int i) throws IOException {
+    public Line(Point start, Point end, int i) {
         this.start = start;
         this.end = end;
 
         generatePoints(start, end);
 
-        this.getNodes(i);
+//        nodes = rayCast();
+//
+//        generateNodeBased();
+
+        //this.getNodes(i);
     }
 
     private static double frac(double a, double b) {
         return a / b;
+    }
+
+    private void pathGen(Point s, Point e) {
+
+        Node start = World.findNode(s.getLocation());
+        Node end = World.findNode(e.getLocation());
+
+        Node best = null;
+
+
+        for (Node n : start.getNeighbors()) {
+            if (n.getLocation().equals(end.getLocation())) {
+                generatePoints(new Point(48 + (s.getLocation().x * 65), 48 + (s.getLocation().y * 65)), new Point(48 + (e.x * 65), 48 + (e.y * 65)));
+                return;
+            } else {
+                // && !notLocalBlocked(start, n)
+                if (!n.isBlocked() && !n.isVisited()) {
+                    if (best == null) {
+                        best = n;
+                    } else {
+                        if (manhattanDistance(best) > manhattanDistance(n)) {
+                            best = n;
+                        }
+                    }
+                    n.setVisited(true);
+
+                }
+            }
+
+        }
+        if (best != null) {
+            generatePoints(new Point(48 + (s.getLocation().x * 65), 48 + (s.getLocation().y * 65)), new Point(48 + (best.getLocation().x * 65), 48 + (best.getLocation().y * 65)));
+            if (best.getLocation().equals(e.getLocation())) {
+                return;
+            }
+            pathGen(best.getLocation(), e);
+        }
+    }
+
+//    private boolean notLocalBlocked(Node start, Node n) {
+//    }
+
+    private void generateNodeBased() {
+        // reset points to be node based
+        points.clear();
+        for (int i = 0; i < nodes.size() - 1; i++) {
+            Point start = new Point(48 + (nodes.get(i).getLocation().x * 65), 48 + (nodes.get(i).getLocation().y * 65));
+            Point end = new Point(48 + (nodes.get(i + 1).getLocation().x * 65), 48 + (nodes.get(i + 1).getLocation().y * 65));
+
+            generatePoints(start, end);
+        }
+    }
+
+    private ArrayList<Node> rayCast() {
+        ArrayList<Node> list = new ArrayList<>();
+
+        for (Point p : this.points) {
+            Point location = new Point((int) ((p.getX()) / 65), (int) (((p.getY()) - 32) / 65));
+            if (!list.contains(World.findNode(location)))
+                list.add(World.findNode(location));
+
+        }
+        return list;
     }
 
     private void generatePoints(Point start, Point end) {
@@ -101,112 +179,131 @@ class Line {
         return components;
     }
 
-    public void getNodes(int i) throws IOException {
-
-        ArrayList<Point> localPoints = getPoints();
-
-        for (Point p : localPoints) {
-            Point location = new Point((int) ((p.getX()) / 65), (int) (((p.getY()) - 32) / 65));
-
-            // if node is blocked we must move around it
-            if (!World.notBlocked(location)) {
-
-                Node best = getBest(World.findNode(location));
-//                if(best == null) {
-//                    continue;
-//                }
-                System.out.println(best.getLocation());
-                if(best.isBlocked()) {
-                    System.out.println("What the fuck");
-                }
-
-
-                Point pathBreak = new Point(48 + (location.getLocation().x * 65), 48 + (location.getLocation().y * 65));
-                Point bestPx = new Point(48 + (best.getLocation().x * 65), 48 + (best.getLocation().y * 65));
-
-                Main.getGraphics().drawImage(Main.getPathbreak(), pathBreak.x, pathBreak.y);
-                Main.getGraphics().update();
-
-                Line partitionOne = new Line(start, bestPx, i++);
-                Line partitionTwo = new Line(bestPx, end, i++);
-                System.out.println("Depth: " +  i);
-
-                partitionOne.getNodes(i);
-                partitionTwo.getNodes(i);
-
-                points = new ArrayList<>();
-                points.addAll(partitionOne.getPoints());
-                points.addAll(partitionTwo.getPoints());
-                break;
-            }
-
-
-//            if (!points.contains(location)) {
-//                points.add(location);
-//            }
+    public Line split(Line l, int i) {
+        getConflicts();
+        //while (getConflicts() > 0) {
+        if (l.blockedNodes.isEmpty()) {
+            return l;
         }
 
+        Node node = l.blockedNodes.get(l.blockedNodes.size() / 2);
+        System.out.println(node.getLocation());
+
+        Node best = getBest(node).n();
+        BestNode.clear();
+//
+//            System.err.println("Best location: " + best.getLocation());
+//
+        Point pathBreak = new Point(48 + (node.getLocation().x * 65), 48 + (node.getLocation().y * 65));
+        Point bestPx = new Point(48 + (best.getLocation().x * 65), 48 + (best.getLocation().y * 65));
+
+        Main.getGraphics().drawImage(Main.getPathbreak(), pathBreak.x, pathBreak.y);
+        Main.getGraphics().drawImage(Main.getChecked(), bestPx.x, bestPx.y);
+        Main.getGraphics().update();
+//
+        Line partitionOne = new Line(start, bestPx, 0);
+        Line partitionTwo = new Line(bestPx, end, 0);
+        l.blockedNodes.clear();
+
+        points.clear();
+        points.addAll(partitionOne.getPoints());
+        points.addAll(partitionTwo.getPoints());
+
+
+//        partitionOne = split(partitionOne, 0);
+//
+//        partitionTwo = split(partitionTwo, 0);
+
+
+        components.add(partitionOne);
+        components.add(partitionTwo);
+
+        for (Node n : blockedNodes) {
+            System.out.println("Blocked Location: " + n.getLocation());
+
+        }
+
+
+        //}
+
+        return this;
     }
 
-    private Node getBest(Node node) {
-        int bestH = 1000000;
-
-        Node bestNode = null;
-
-        Point bestPx = new Point(48 + (node.getLocation().x * 65), 48 + (node.getLocation().y * 65));
-//        Main.getGraphics().drawImage(Main.getChecked(), bestPx.x, bestPx.y);
-//        Main.getGraphics().update();
+    private Heuristic getBest(Node node) {
+        // find the best node nearby - the lowest heuristic
 
         for (Node n : node.getNeighbors()) {
-            if(bestNode == null) {
-                bestNode = n;
+//            Point pathBreak = new Point(48 + (n.getLocation().x * 65), 48 + (n.getLocation().y * 65));
+//
+//            Main.getGraphics().drawImage(Main.getChecked(), pathBreak.x, pathBreak.y);
+//            Main.getGraphics().update();
+            System.err.println("Point: " + n.getLocation());
+            System.out.println("Manhattan Distance: " + manhattanDistance(n));
+
+            if (!n.isVisited()) {
+
+                n.setVisited(true);
+
+                if (n.isBlocked()) {
+                    BestNode.add(getBest(n));
+                    continue;
+                }
+                BestNode.add(new Heuristic(n, manhattanDistance(n)));
+
             }
 
 
-            try {
-                int localHeuristic = manhattanDistance(n);
-                System.out.println(localHeuristic);
-
-                if (!n.isVisited()) {
-                    Node curr = n;
-                    curr.setVisited(true);
-
-                    if (n.isBlocked()) {
-                        System.out.println("Running");
-                        curr = getBest(n);
-                    }
-
-                    if (localHeuristic > bestH) {
-                        bestH = localHeuristic;
-                        bestNode = curr;
-                    }
-
-
-                }
-            } catch(NullPointerException ignored){}
         }
-//        for (Node n : node.getNeighbors()) {
-//            try {
-//                n.setVisited(false);
-//            } catch(NullPointerException ignored){}
-//        }
-        assert bestNode != null;
-        if(bestNode.isBlocked()) {
-//            for (Node n : node.getNeighbors()) {
-//            try {
-//                n.setVisited(false);
-//            } catch(NullPointerException ignored){}
-            bestNode = getBest(node.getLeft());
-        }
-//        }
 
-        return bestNode;
-
-
+        System.out.println(BestNode.t);
+        Main.getGraphics().drawImage(Main.getFlag(), 48 + (BestNode.t.n().getLocation().x * 65), 48 + (BestNode.t.n().getLocation().y * 65));
+        Main.getGraphics().update();
+        return BestNode.t;
     }
 
+    /**
+     * @param n Node to be calculated
+     * @return Heuristic value
+     * Calculates manhattan distance * conflicts
+     */
     private int manhattanDistance(Node n) {
-        return Math.abs(n.getLocation().x - end.x) + Math.abs(n.getLocation().y - end.y);
+        return (Math.abs(n.getLocation().x - end.x) + Math.abs(n.getLocation().y - end.y));// * ((new Line(start, n.getLocation().getLocation(), 't').getConflicts() + new Line(n.getLocation().getLocation(), end, 't').getConflicts()));
+    }
+
+    private double distance(Node n) {
+        return 0;
+    }
+
+    private int getConflicts() {
+        blockedNodes.clear();
+        for (Point p : this.getPoints()) {
+            Point location = new Point((int) ((p.getX()) / 65), (int) (((p.getY()) - 32) / 65));
+
+            //if node is blocked we must move around it
+            if (!World.notBlocked(location)) {
+                if (!blockedNodes.contains(World.findNode(location))) {
+                    blockedNodes.add(World.findNode(location));
+                }
+            }
+        }
+
+        return blockedNodes.size();
+    }
+
+    private int getConflicts(Line l) {
+        l.blockedNodes.clear();
+        for (Point p : l.getPoints()) {
+            Point location = new Point((int) ((p.getX()) / 65), (int) (((p.getY()) - 32) / 65));
+
+            //if node is blocked we must move around it
+            if (!World.notBlocked(location)) {
+                if (!l.blockedNodes.contains(World.findNode(location))) {
+                    l.blockedNodes.add(World.findNode(location));
+                }
+            }
+        }
+
+        return l.blockedNodes.size();
     }
 
     /*

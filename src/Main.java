@@ -62,6 +62,7 @@ public class Main {
         frame.setIconImage(startImg);
 
         World world = new World();
+        World.setup();
 
         frame.addMouseListener(new MouseAdapter() {
             public void mousePressed(MouseEvent e) {
@@ -84,12 +85,18 @@ public class Main {
                                     end = justClicked;
 
                                     graphics.update();
+                                    Line line;
                                     try {
-                                        graphics.drawLine(new Line(start, end));
-                                        graphics.update();
+                                        start = new Point((int) ((start.getX()) / 65), (int) (((start.getY()) - 32) / 65));
+                                        end = new Point((int) ((end.getX()) / 65), (int) (((end.getY()) - 32) / 65));
+
+                                        line = new Line(start, end);
                                     } catch (IOException ex) {
                                         throw new RuntimeException(ex);
                                     }
+
+                                    graphics.drawLine(line);
+                                    graphics.update();
 
                                 }
                             }
@@ -119,9 +126,11 @@ public class Main {
 
             @Override
             public void keyPressed(KeyEvent e) {
-                if(e.getKeyCode() == KeyEvent.VK_ENTER) {
+                if (e.getKeyCode() == KeyEvent.VK_ENTER) {
 
                     World world = new World();
+                    World.setup();
+
                     graphics.reset();
 
                     for (int i = 0; i < 15; i++) {
@@ -162,4 +171,7 @@ public class Main {
 
     }
 
+    public static BufferedImage getFlag() {
+        return startImg;
+    }
 }

@@ -7,8 +7,8 @@ public class Image extends JPanel {
     private final int width;
     private final int height;
     private final BufferedImage img;
-    protected ArrayList<Node> nodes = new ArrayList<>();
     private final ArrayList<Point> toDraw = new ArrayList<Point>();
+    protected ArrayList<Node> nodes = new ArrayList<>();
 
     public Image(int width, int height) {
         this.width = width;
